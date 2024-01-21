@@ -78,7 +78,6 @@ public class ApiTests extends TestBase {
                         .then()
                         .spec(response204));
 
-
                 UserDataResponse getUserNewDataResponse = step("Отправляем запрос" +
                         "на получение данных о пользователе и добавленных ему книгах", () ->
                      given(request)
