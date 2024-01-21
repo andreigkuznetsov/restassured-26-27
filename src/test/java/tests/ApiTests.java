@@ -3,6 +3,7 @@ package tests;
 import data.TestData;
 import helpers.UserRegistrationAndDeleting;
 import models.*;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -14,12 +15,14 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static specs.ApiMethodsSpecs.*;
 
+@DisplayName("API тесты demoqa.com WebShop")
 public class ApiTests extends TestBase {
 
         TestData testData = new TestData();
 
         @Test
         @UserRegistrationAndDeleting
+        @DisplayName("Проверка удаления книги из профиля пользователя")
         void removeBookFromUserProfileTest() {
                 AddListOfBooksRequest booksToAdd = new AddListOfBooksRequest();
                 ListOfIsbns isbns = new ListOfIsbns();
