@@ -25,7 +25,7 @@ public class ApiTests extends TestBase {
         @Test
         @WithUserRegistration
         @DisplayName("Проверка успешного удаления зарегистрированного пользователя")
-        void userSuccessfulDeletingTest() {
+        void successfulDeletingUserTest() {
                 step("Отправляем запрос на удаление пользователя", () ->
                         given(requestGetDelete)
                                 .header("Authorization", "Bearer " +
