@@ -1,7 +1,8 @@
 package tests;
 
 import data.TestData;
-import helpers.UserRegistrationAndDeleting;
+import helpers.WithUserDeleting;
+import helpers.WithUserRegistration;
 import models.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,7 +10,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static data.ApiEndpoints.*;
-import static helpers.UserRegistrationAndDeletingExtension.*;
+import static helpers.WithUserRegistrationExtension.getGenerateTokenResponse;
+import static helpers.WithUserRegistrationExtension.getRegistrationResponse;
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,8 +23,41 @@ public class ApiTests extends TestBase {
         TestData testData = new TestData();
 
         @Test
-        @UserRegistrationAndDeleting
-        @DisplayName("Проверка удаления книги из профиля пользователя")
+        @WithUserRegistration
+        @DisplayName("Проверка успешного удаления зарегистрированного пользователя")
+        void userSuccessfulDeletingTest() {
+                step("Отправляем запрос на удаление пользователя", () ->
+                        given(requestGetDelete)
+                                .header("Authorization", "Bearer " +
+                                        getGenerateTokenResponse().getToken())
+                                .when()
+                                .delete(USER_ACCOUNT + getRegistrationResponse().getUserId())
+                                .then()
+                                .spec(response204));
+
+                UserDataResponse getInvalidUserDataResponse = step("Отправляем запрос" +
+                        "на получение данных о пользователе и добавленных ему книгах", () ->
+                        given(requestGetDelete)
+                                .header("Authorization", "Bearer " +
+                                        getGenerateTokenResponse().getToken())
+                                .when()
+                                .get(USER_ACCOUNT + getRegistrationResponse().getUserId())
+                                .then()
+                                .spec(response401)
+                                .extract().as(UserDataResponse.class));
+
+                step("Проверяем, что значение Code совпадает с ожидаемыми", () -> {
+                        assertThat(getInvalidUserDataResponse.getCode()).isEqualTo(testData.userNotFoundCode);
+                });
+                step("Проверяем, что значение Message - \"User not found!\"", () -> {
+                        assertThat(getInvalidUserDataResponse.getMessage()).isEqualTo(testData.userNotFoundMessage);
+                });
+        }
+
+        @Test
+        @WithUserRegistration
+        @WithUserDeleting
+        @DisplayName("Проверка успешного удаления книги из профиля пользователя")
         void removeBookFromUserProfileTest() {
                 AddListOfBooksRequest booksToAdd = new AddListOfBooksRequest();
                 ListOfIsbns isbns = new ListOfIsbns();

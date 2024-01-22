@@ -12,7 +12,7 @@ import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 import static specs.ApiMethodsSpecs.*;
 
-public class UserRegistrationAndDeletingExtension implements BeforeEachCallback, AfterEachCallback {
+public class WithUserRegistrationExtension implements BeforeEachCallback {
 
     public static UserDataResponse registrationResponse;
     public static GenerateTokenResponse generateTokenResponse;
@@ -23,7 +23,7 @@ public class UserRegistrationAndDeletingExtension implements BeforeEachCallback,
         if (context.getElement().isPresent() && context.getElement().get() instanceof java.lang.reflect.Method) {
             java.lang.reflect.Method testMethod = (java.lang.reflect.Method) context.getElement().get();
 
-            if (testMethod.isAnnotationPresent(UserRegistrationAndDeleting.class)) {
+            if (testMethod.isAnnotationPresent(WithUserRegistration.class)) {
                 UserDataRequest userData = new UserDataRequest();
                 userData.setUserName(testData.userName);
                 userData.setPassword(testData.password);
@@ -46,22 +46,6 @@ public class UserRegistrationAndDeletingExtension implements BeforeEachCallback,
                         .then()
                         .spec(response200)
                         .extract().as(GenerateTokenResponse.class));
-            }
-        }
-    }
-
-    @Override
-    public void afterEach(ExtensionContext context) {
-        if (context.getElement().isPresent() && context.getElement().get() instanceof java.lang.reflect.Method) {
-            java.lang.reflect.Method testMethod = (java.lang.reflect.Method) context.getElement().get();
-
-            if (testMethod.isAnnotationPresent(UserRegistrationAndDeleting.class)) {
-                step("Отправляем запрос на удаление пользователя и проверяем Status Code ответа", () ->
-                    given(requestGetDelete)
-                         .header("Authorization", "Bearer " + generateTokenResponse.getToken())
-                         .when()
-                         .delete(USER_ACCOUNT + registrationResponse.getUserId())
-                         .then().spec(response204));
             }
         }
     }
